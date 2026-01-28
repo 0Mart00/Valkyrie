@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "PRISMA_CLIENT_ENGINE_TYPE='library' next dev --turbo",
+    "build": "PRISMA_CLIENT_ENGINE_TYPE='library' next build",
     "start": "next start",
     "db:push": "npx prisma db push",
     "db:studio": "npx prisma studio",

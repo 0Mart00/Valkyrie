@@ -1,18 +1,27 @@
-// lib/db.ts
-//import { PrismaClient } from "@prisma/client";
-// Próbáld meg ezt, ha a sima import piros:
-//import { PrismaClient } from '.prisma/client'; 
-// VAGY maradjon az eredeti, de adjunk neki egy kis segítséget:
-import { PrismaClient } from '@prisma/client/index';
+import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-export const db =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    // Itt nem konfigurálunk semmi extrát, hagyjuk a bináris motornak
+export const getDb = () => {
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
+
+  // Natív Postgres pool létrehozása
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+  const adapter = new PrismaPg(pool)
+
+  // Itt adjuk át az adaptert, amit a hibaüzenet hiányolt
+  const client = new PrismaClient({
+    adapter,
     log: ["error"],
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+  if (process.env.NODE_ENV !== "production") {
+    globalForPrisma.prisma = client;
+  }
+  
+  return client;
+};

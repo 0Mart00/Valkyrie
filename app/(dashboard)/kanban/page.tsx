@@ -6,8 +6,9 @@ import React from 'react';
 import { KanbanBoard } from '@/components/kanban/Board';
 
 export default async function KanbanPage() {
-  // CSAK ITT IMPORTÁLJUK: Így a builder nem fut bele a Prisma initbe
-  const { db } = await import('@/lib/db');
+  // A 'db' konstans helyett a 'getDb' függvényt importáljuk dinamikusan
+  const { getDb } = await import('@/lib/db');
+  const db = getDb();
 
   const project = await db.project.findFirst({
     include: {

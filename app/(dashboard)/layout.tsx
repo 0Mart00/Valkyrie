@@ -1,5 +1,8 @@
 // app/(dashboard)/layout.tsx
-import React from 'react';
+import React from "react";
+export const runtime = "nodejs";
+
+
 import Link from 'next/link';
 // Itt javítva: Kanba -> Kanban
 import { LayoutDashboard, MessageSquare, Kanban, Share2, Settings, Database } from 'lucide-react';
