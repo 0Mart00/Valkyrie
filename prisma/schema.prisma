@@ -1,108 +1,109 @@
 // prisma/schema.prisma
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+provider        = "prisma-client-js"
+previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+provider = "postgresql"
+// Az 'url' mező törölve - a prisma.config.ts kezeli
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  avatarUrl String?
-  tasks     Task[]   @relation("TaskAssignee")
-  messages  Message[]
-  posts     Post[]
-  comments  Comment[]
+id        String    @id @default(uuid())
+email     String    @unique
+name      String?
+avatarUrl String?
+role      String    @default("DEV")
+tasks     Task[]    @relation("TaskAssignee")
+messages  Message[]
+posts     Post[]
+comments  Comment[]
 }
 
 model Project {
-  id        String   @id @default(uuid())
-  name      String
-  columns   Column[]
-  channels  Channel[]
-  posts     Post[]
+id        String    @id @default(uuid())
+name      String
+columns   Column[]
+channels  Channel[]
+posts     Post[]
 }
 
-// --- KANBAN MODUL ---
 model Column {
-  id        String @id @default(uuid())
-  title     String
-  order     Int
-  projectId String
-  project   Project @relation(fields: [projectId], references: [id])
-  tasks     Task[]
+id        String @id @default(uuid())
+title     String
+order     Int
+projectId String
+project   Project @relation(fields: [projectId], references: [id])
+tasks     Task[]
 }
 
 model Task {
-  id          String   @id @default(uuid())
-  title       String
-  description String?  @db.Text // Markdown content
-  priority    Priority @default(MEDIUM)
-  columnId    String
-  column      Column   @relation(fields: [columnId], references: [id])
-  assigneeId  String?
-  assignee    User?    @relation("TaskAssignee", fields: [assigneeId], references: [id])
-  createdAt   DateTime @default(now())
+id          String   @id @default(uuid())
+title       String
+description String?  @db.Text
+priority    Priority @default(MEDIUM)
+columnId    String
+column      Column   @relation(fields: [columnId], references: [id])
+assigneeId  String?
+assignee    User?    @relation("TaskAssignee", fields: [assigneeId], references: [id])
+createdAt   DateTime @default(now())
 }
 
 enum Priority {
-  LOW
-  MEDIUM
-  HIGH
-  CRITICAL
+LOW
+MEDIUM
+HIGH
+CRITICAL
 }
 
-// --- CHAT MODUL ---
 model Channel {
-  id        String    @id @default(uuid())
-  name      String
-  type      ChannelType @default(PROJECT)
-  projectId String?
-  project   Project?  @relation(fields: [projectId], references: [id])
-  messages  Message[]
+id        String      @id @default(uuid())
+name      String
+type      ChannelType @default(PROJECT)
+level     String      @default("DEV")
+password  String      @default("")
+projectId String?
+project   Project?    @relation(fields: [projectId], references: [id])
+messages  Message[]
 }
 
 enum ChannelType {
-  GLOBAL
-  PROJECT
-  PRIVATE
+GLOBAL
+PROJECT
+PRIVATE
 }
 
 model Message {
-  id        String   @id @default(uuid())
-  content   String
-  channelId String
-  channel   Channel  @relation(fields: [channelId], references: [id])
-  userId    String?  // Nullable for System Messages (pl. Task updates)
-  user      User?    @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
+id        String   @id @default(uuid())
+content   String
+channelId String
+channel   Channel  @relation(fields: [channelId], references: [id])
+userId    String?
+
+user      User?    @relation(fields: [userId], references: [id])
+createdAt DateTime @default(now())
 }
 
-// --- SOCIAL FEED ---
 model Post {
-  id        String    @id @default(uuid())
-  content   String    @db.Text // Markdown
-  imageUrl  String?
-  projectId String
-  project   Project   @relation(fields: [projectId], references: [id])
-  authorId  String
-  author    User      @relation(fields: [authorId], references: [id])
-  likes     Int       @default(0)
-  comments  Comment[]
-  createdAt DateTime  @default(now())
+id        String    @id @default(uuid())
+content   String    @db.Text
+imageUrl  String?
+projectId String
+project   Project   @relation(fields: [projectId], references: [id])
+authorId  String
+author    User      @relation(fields: [authorId], references: [id])
+likes     Int       @default(0)
+comments  Comment[]
+createdAt DateTime  @default(now())
 }
 
 model Comment {
-  id        String   @id @default(uuid())
-  content   String
-  postId    String
-  post      Post     @relation(fields: [postId], references: [id])
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
+id        String   @id @default(uuid())
+content   String
+postId    String
+post      Post     @relation(fields: [postId], references: [id])
+authorId  String
+author    User     @relation(fields: [authorId], references: [id])
 }
