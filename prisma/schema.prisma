@@ -1,109 +1,133 @@
 // prisma/schema.prisma
 
 generator client {
-provider        = "prisma-client-js"
-previewFeatures = ["driverAdapters"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-provider = "postgresql"
-// Az 'url' mező törölve - a prisma.config.ts kezeli
+  provider = "postgresql"
 }
 
-model User {
-id        String    @id @default(uuid())
-email     String    @unique
-name      String?
-avatarUrl String?
-role      String    @default("DEV")
-tasks     Task[]    @relation("TaskAssignee")
-messages  Message[]
-posts     Post[]
-comments  Comment[]
-}
-
-model Project {
-id        String    @id @default(uuid())
-name      String
-columns   Column[]
-channels  Channel[]
-posts     Post[]
-}
-
-model Column {
-id        String @id @default(uuid())
-title     String
-order     Int
-projectId String
-project   Project @relation(fields: [projectId], references: [id])
-tasks     Task[]
-}
-
-model Task {
-id          String   @id @default(uuid())
-title       String
-description String?  @db.Text
-priority    Priority @default(MEDIUM)
-columnId    String
-column      Column   @relation(fields: [columnId], references: [id])
-assigneeId  String?
-assignee    User?    @relation("TaskAssignee", fields: [assigneeId], references: [id])
-createdAt   DateTime @default(now())
+enum TaskType {
+  TASK
+  BUG
+  DEADLINE
+  DECISION
+  MEETING
+  APPROVAL
+  RISK
+  REVIEW
 }
 
 enum Priority {
-LOW
-MEDIUM
-HIGH
-CRITICAL
-}
-
-model Channel {
-id        String      @id @default(uuid())
-name      String
-type      ChannelType @default(PROJECT)
-level     String      @default("DEV")
-password  String      @default("")
-projectId String?
-project   Project?    @relation(fields: [projectId], references: [id])
-messages  Message[]
+  P1
+  P2
+  P3
+  P4
 }
 
 enum ChannelType {
-GLOBAL
-PROJECT
-PRIVATE
+  GLOBAL
+  PROJECT
+  PRIVATE
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  avatarUrl String?
+  role      String    @default("DEV")
+  tasks     Task[]    @relation("TaskAssignee")
+  messages  Message[]
+  posts     Post[]
+  comments  Comment[]
+}
+
+model Project {
+  id        String    @id @default(uuid())
+  name      String
+  columns   Column[]
+  channels  Channel[]
+  posts     Post[]
+}
+
+model Column {
+  id        String  @id @default(uuid())
+  title     String
+  order     Int
+  wipLimit  Int?    // PM-fókuszú WIP limit
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  tasks     Task[]
+}
+
+model Task {
+  id            String    @id @default(uuid())
+  title         String
+  description   String?   @db.Text
+  status        String    // pl. "TODO", "IN_PROGRESS" stb.
+  priority      Priority  @default(P4)
+  type          TaskType  @default(TASK)
+  
+  // Kapcsolatok
+  columnId      String
+  column        Column    @relation(fields: [columnId], references: [id])
+  assigneeId    String?
+  assignee      User?     @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  
+  // PM fókuszú mezők
+  dueDate       DateTime?
+  isBlocked     Boolean   @default(false)
+  blockerReason String?
+  
+  // Időmérés
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  startedAt     DateTime? // Aging számításhoz
+}
+
+model Channel {
+  id        String      @id @default(uuid())
+  name      String
+  type      ChannelType @default(PROJECT)
+  level     String      @default("DEV")
+  password  String      @default("")
+  projectId String?
+  project   Project?    @relation(fields: [projectId], references: [id])
+  messages  Message[]
 }
 
 model Message {
-id        String   @id @default(uuid())
-content   String
-channelId String
-channel   Channel  @relation(fields: [channelId], references: [id])
-userId    String?
-
-user      User?    @relation(fields: [userId], references: [id])
-createdAt DateTime @default(now())
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  channelId String
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model Post {
-id        String    @id @default(uuid())
-content   String    @db.Text
-imageUrl  String?
-projectId String
-project   Project   @relation(fields: [projectId], references: [id])
-authorId  String
-author    User      @relation(fields: [authorId], references: [id])
-likes     Int       @default(0)
-comments  Comment[]
-createdAt DateTime  @default(now())
+  id        String    @id @default(uuid())
+  content   String    @db.Text
+  imageUrl  String?
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id])
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id])
+  likes     Int       @default(0)
+  comments  Comment[]
+  createdAt DateTime  @default(now())
 }
 
 model Comment {
-id        String   @id @default(uuid())
-content   String
-postId    String
-post      Post     @relation(fields: [postId], references: [id])
-authorId  String
-author    User     @relation(fields: [authorId], references: [id])
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
 }

@@ -1,12 +1,16 @@
-// prisma.config.ts
 import { defineConfig } from '@prisma/config';
-import * as dotenv from 'dotenv';
 
-dotenv.config();
-
+/**
+ * Valkyrie System - Prisma 7 Configuration
+ * Centralized database management for master-workspace
+ */
 export default defineConfig({
-  schema: 'prisma/schema.prisma', // Itt csak a string kell, nem az objektum!
+  schema: './prisma/schema.prisma',
   datasource: {
     url: process.env.DATABASE_URL,
+  },
+  // EZT ADD HOZZÁ:
+  migrations: {
+    seed: 'npx ts-node ./prisma/seed.ts',
   },
 });

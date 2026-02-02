@@ -290,33 +290,33 @@ export function ChatInterface({ initialMessages }: ChatInterfaceProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-slate-950/50 relative">
-      {/* Rendszer Vezérlő Sáv */}
-      <div className="px-4 py-2 border-b border-slate-900 bg-slate-900/20 flex justify-between items-center z-20">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-[10px] font-mono text-slate-500">
-            <Terminal size={12} className="text-emerald-500" />
-            <span>SESSION_NODE: ACTIVE</span>
-          </div>
-          {isAuthorized && activeChannelId && (
-            <Badge variant="outline" className="h-5 text-[9px] border-emerald-500/30 text-emerald-400 font-mono bg-emerald-500/5">
-              ENCRYPTED_LINK
-            </Badge>
-          )}
+  <div className="flex flex-col h-full bg-slate-950/50 relative">
+    {/* Rendszer Vezérlő Sáv */}
+    <div className="px-4 py-2 border-b border-slate-900 bg-slate-900/20 flex justify-between items-center z-20">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 text-[10px] font-mono text-slate-500">
+          <Terminal size={12} className="text-emerald-500" />
+          <span>SESSION_NODE: ACTIVE</span>
         </div>
-        <Button 
-          onClick={() => {
-            setChannelError(null);
-            setIsModalOpen(true);
-          }}
-          variant="outline" 
-          size="sm" 
-          className="h-7 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10 text-[10px] font-mono"
-        >
-          <Plus size={12} className="mr-2" />
-          NEW_CHANNEL_INIT
-        </Button>
+        {isAuthorized && activeChannelId && (
+          <div className="flex items-center px-1.5 h-5 text-[9px] border border-emerald-500/30 text-emerald-400 font-mono bg-emerald-500/5 rounded uppercase tracking-tighter">
+            ENCRYPTED_LINK
+          </div>
+        )}
       </div>
+      <Button 
+        onClick={() => {
+          setChannelError(null);
+          setIsModalOpen(true);
+        }}
+        variant="outline" 
+        size="sm" 
+        className="h-7 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10 text-[10px] font-mono"
+      >
+        <Plus size={12} className="mr-2" />
+        NEW_CHANNEL_INIT
+      </Button>
+    </div>
 
       {/* ÜZENETEK LISTA */}
       <div 

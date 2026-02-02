@@ -1,25 +1,25 @@
-// app/api/tasks/update/route.ts
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
-
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+import { getDb } from "@/lib/db";
 
 export async function PATCH(req: Request) {
-  // A 'db' destruktúrálás helyett a 'getDb' függvényt importáljuk
-  const { getDb } = await import('@/lib/db');
-  const db = getDb();
-
   try {
-    const { taskId, newColumnId } = await req.json();
-    
+    const { taskId, status, isBlocked, blockerReason } = await req.json();
+    const db = await getDb();
+
+    const updateData: any = { status, isBlocked, blockerReason };
+
+    // Ha most kerül folyamatba, rögzítjük az időpontot az aging számításhoz
+    if (status === "IN_PROGRESS") {
+      updateData.startedAt = new Date();
+    }
+
     const updatedTask = await db.task.update({
       where: { id: taskId },
-      data: { columnId: newColumnId },
+      data: updateData,
     });
-    
+
     return NextResponse.json(updatedTask);
   } catch (error) {
-    console.error("TASK_UPDATE_ERROR:", error);
-    return NextResponse.json({ error: "DATABASE_ERROR" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update task" }, { status: 500 });
   }
 }

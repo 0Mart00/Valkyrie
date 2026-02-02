@@ -1,34 +1,58 @@
-import { KanbanBoard } from "@/components/kanban/Board";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-8">
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-8 border-b border-slate-800 pb-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tighter italic">MASTER_WORKSPACE_v1.0</h1>
-          <div className="flex gap-4 text-xs font-mono text-emerald-500">
-            <span>DB_STATUS: ONLINE</span>
-            <span>AUTH_STATUS: BYPASSED_DEV</span>
-          </div>
+    <main className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
+      {/* Dekorációs elem a háttérben */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-50" />
+
+      <div className="max-w-md w-full text-center space-y-8">
+        <header className="space-y-2">
+          <h1 className="text-5xl font-extrabold tracking-tighter italic text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-500">
+            VALKYRIE
+          </h1>
+          <p className="text-emerald-500 font-mono text-sm tracking-widest uppercase">
+            Master Control Interface v1.0
+          </p>
         </header>
-        
-        {/* Ide kerül majd a Kanban tábla */}
-        <div className="grid grid-cols-1 gap-6">
-          <div className="bg-slate-900/50 rounded-xl border border-slate-800 p-6 min-h-[600px]">
-            <h2 className="text-xl font-semibold mb-6">Projekt: Alpha Stratégia</h2>
-            <p className="text-slate-400 mb-4 text-sm">Húzd át a kártyákat az oszlopok között a státusz módosításához.</p>
-            {/* Itt hívjuk majd be a Board komponenst */}
-            <div className="flex gap-4">
-               {/* Ideiglenes placeholder oszlopok */}
-               <div className="w-80 h-96 bg-slate-800/50 rounded-lg border border-dashed border-slate-700 flex items-center justify-center text-slate-500">
-                  Backlog (Empty)
-               </div>
-               <div className="w-80 h-96 bg-slate-800/50 rounded-lg border border-dashed border-slate-700 flex items-center justify-center text-slate-500">
-                  In Progress (Empty)
-               </div>
+
+        <div className="bg-slate-900/50 p-8 rounded-2xl border border-slate-800 backdrop-blur-sm shadow-2xl">
+          <p className="text-slate-400 mb-8 text-sm">
+            Üdvözöljük a rendszerben. A folytatáshoz azonosítás vagy új profil létrehozása szükséges.
+          </p>
+
+          <div className="flex flex-col gap-4">
+            <Link href="/auth/login" className="w-full">
+              <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-6 transition-all duration-200 border-b-4 border-emerald-800 active:border-b-0">
+                BEJELENTKEZÉS
+              </Button>
+            </Link>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-slate-800"></span>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-slate-900 px-2 text-slate-500 font-mono">VAGY</span>
+              </div>
             </div>
+
+            <Link href="/auth/register" className="w-full">
+              <Button variant="outline" className="w-full border-slate-700 hover:bg-slate-800 text-slate-300 py-6 font-semibold">
+                REGISZTRÁCIÓ
+              </Button>
+            </Link>
           </div>
         </div>
+
+        <footer className="pt-8 flex justify-center gap-6 text-xs font-mono text-slate-600">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+            SYSTEM_ONLINE
+          </div>
+          <div>ENCRYPTED_SESSION</div>
+        </footer>
       </div>
     </main>
   );
